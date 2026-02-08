@@ -12,31 +12,44 @@
       --text: #e8eeff;
       --muted: #aab6e6;
       --accent: #7aa2ff;
-      --danger: #ff6b6b;
       --ok: #2de38b;
       --warn: #ffcf5c;
       --border: rgba(255,255,255,0.10);
+      --shadow: 0 16px 40px rgba(0,0,0,0.35);
     }
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: linear-gradient(180deg, var(--bg), #070b16); color: var(--text); }
-    header { padding: 20px 18px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.12); position: sticky; top: 0; backdrop-filter: blur(8px); }
+    header { padding: 20px 18px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.12); position: sticky; top: 0; backdrop-filter: blur(8px); z-index: 5; }
     h1 { margin: 0; font-size: 18px; }
     .sub { margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+
     .wrap { padding: 16px 14px 28px; max-width: 1200px; margin: 0 auto; }
     .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-    button { cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); padding: 8px 10px; border-radius: 10px; font-weight: 600; }
+
+    button { cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); padding: 8px 10px; border-radius: 10px; font-weight: 700; }
     button:hover { border-color: rgba(255,255,255,0.25); }
+    button.primary { background: rgba(122,162,255,0.18); border-color: rgba(122,162,255,0.35); }
+
     .pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.04); color: var(--muted); font-size: 12px; }
     .pill b { color: var(--text); }
+
     .grid { display: grid; grid-template-columns: repeat(5, minmax(220px, 1fr)); gap: 10px; }
     @media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, minmax(220px, 1fr)); } }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
-    .col { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+
+    .col { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; min-height: 120px; }
     .col h2 { margin: 0; padding: 10px 12px; font-size: 14px; background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-    .col h2 span { color: var(--muted); font-weight: 600; }
-    .cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
-    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
-    .title { font-weight: 800; font-size: 13px; margin-bottom: 6px; }
-    .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .col h2 span { color: var(--muted); font-weight: 700; }
+    .cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; min-height: 70px; }
+
+    .cards.dragover { outline: 2px dashed rgba(122,162,255,0.55); outline-offset: -6px; background: rgba(122,162,255,0.06); }
+
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; box-shadow: 0 0 0 rgba(0,0,0,0); transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease; }
+    .card:hover { border-color: rgba(255,255,255,0.22); box-shadow: 0 10px 24px rgba(0,0,0,0.25); transform: translateY(-1px); }
+    .card[draggable="true"] { cursor: grab; }
+    .card.dragging { opacity: 0.55; transform: rotate(1deg); }
+
+    .title { font-weight: 900; font-size: 13px; margin-bottom: 6px; }
+    .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .tag { font-size: 11px; border: 1px solid var(--border); padding: 2px 8px; border-radius: 999px; color: var(--muted); }
     .tag.approval { color: #0b1020; border-color: transparent; font-weight: 900; }
     .tag.approval.needs { background: var(--warn); }
@@ -44,14 +57,31 @@
     .desc { color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 8px; white-space: pre-wrap; }
     .small { color: var(--muted); font-size: 12px; }
     a { color: var(--accent); }
+
     .review { border: 1px dashed rgba(255,255,255,0.25); background: rgba(122,162,255,0.10); }
+
+    /* Proposal bar */
+    #proposalBar { display: none; border: 1px solid rgba(255,207,92,0.35); background: rgba(255,207,92,0.10); padding: 10px 12px; border-radius: 14px; box-shadow: var(--shadow); }
+    #proposalText { color: var(--text); font-size: 12px; line-height: 1.35; }
+    code.cmd { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12); padding: 2px 6px; border-radius: 8px; }
+
+    /* Modal */
+    .modalBack { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 20; }
+    .modal { width: min(720px, 100%); background: #0c1430; border: 1px solid rgba(255,255,255,0.14); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+    .modalHead { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.10); display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .modalBody { padding: 12px 14px; }
+    .modalTitle { font-weight: 900; font-size: 14px; }
+    .modalClose { background: transparent; border: 1px solid rgba(255,255,255,0.15); }
+    select { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; padding: 8px 10px; }
+    .modalRow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
   </style>
 </head>
 <body>
   <header>
     <h1>Jonny × theclaw — Agile Board</h1>
     <div class="sub">
-      Source of truth: <code>docs/board.json</code> · Approvals happen in Telegram (“Approved ✅”), then theclaw commits/merges.
+      Source of truth: <code>docs/board.json</code> · Drag/drop & moves are <b>proposals</b> (static site can’t save).<br/>
+      Approvals happen in Telegram (“Approved ✅ #ID”), then theclaw commits.
     </div>
   </header>
 
@@ -64,11 +94,46 @@
       <span class="small">Repo: <a id="repo" href="#" target="_blank" rel="noreferrer">…</a></span>
     </div>
 
+    <div id="proposalBar" class="row">
+      <div style="flex:1; min-width: 260px;">
+        <div class="small" style="margin-bottom:6px;">Proposed command (send this to theclaw in Telegram):</div>
+        <div id="proposalText"></div>
+      </div>
+      <button id="copyCmd" class="primary">Copy</button>
+      <button id="clearCmd">Clear</button>
+    </div>
+
     <div id="reviewRow" class="row" style="display:none;"></div>
 
     <div class="grid" id="grid"></div>
 
-    <p class="small" style="margin-top:14px;">Want changes? Tell theclaw: add columns, add fields, or switch to GitHub Issues-backed board.</p>
+    <p class="small" style="margin-top:14px;">Tip: click a card to open details + move menu. Drag & drop works too (creates a proposal).</p>
+  </div>
+
+  <div id="modalBack" class="modalBack" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modalHead">
+        <div>
+          <div class="modalTitle" id="mTitle">…</div>
+          <div class="small" id="mMeta">…</div>
+        </div>
+        <button class="modalClose" id="mClose">Close</button>
+      </div>
+      <div class="modalBody">
+        <div class="small" style="margin-bottom:8px;">Description</div>
+        <div id="mDesc" class="desc" style="margin-top:0;"></div>
+
+        <div class="modalRow">
+          <label class="small" for="mMove">Move to</label>
+          <select id="mMove"></select>
+          <button id="mPropose" class="primary">Propose Move</button>
+        </div>
+
+        <div class="modalRow" style="margin-top:14px;">
+          <div class="small">Approve (example): <code class="cmd">Approved ✅ #ID</code></div>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -81,11 +146,17 @@ const COLS = [
   { id: 'done', name: 'Done' },
 ];
 
+let BOARD = null;
+let PROPOSAL = null; // { cmd: string }
+let MODAL_CARD_ID = null;
+
 function el(tag, attrs={}, children=[]) {
   const n = document.createElement(tag);
   for (const [k,v] of Object.entries(attrs)) {
     if (k === 'class') n.className = v;
     else if (k === 'text') n.textContent = v;
+    else if (k === 'html') n.innerHTML = v;
+    else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
     else n.setAttribute(k, v);
   }
   for (const c of children) n.appendChild(c);
@@ -97,6 +168,63 @@ function approvalTag(card) {
   if (a.status === 'needs') return el('span', { class: 'tag approval needs', text: 'NEEDS REVIEW' });
   if (a.status === 'approved') return el('span', { class: 'tag approval approved', text: 'APPROVED' });
   return el('span', { class: 'tag', text: 'no approval' });
+}
+
+function setProposal(cmd) {
+  PROPOSAL = { cmd };
+  const bar = document.getElementById('proposalBar');
+  const txt = document.getElementById('proposalText');
+  txt.innerHTML = `<code class="cmd">${escapeHtml(cmd)}</code>`;
+  bar.style.display = 'flex';
+}
+
+function clearProposal() {
+  PROPOSAL = null;
+  document.getElementById('proposalBar').style.display = 'none';
+  document.getElementById('proposalText').innerHTML = '';
+}
+
+function escapeHtml(s) {
+  return (s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+}
+
+function findCard(id) {
+  return (BOARD?.cards || []).find(c => c.id === id);
+}
+
+function proposeMove(cardId, toStatus) {
+  const card = findCard(cardId);
+  if (!card) return;
+  setProposal(`Move #${cardId} to ${toStatus}`);
+
+  // Update UI optimistically (local only)
+  card.status = toStatus;
+  render(BOARD);
+}
+
+function openModal(cardId) {
+  const card = findCard(cardId);
+  if (!card) return;
+  MODAL_CARD_ID = cardId;
+
+  document.getElementById('mTitle').textContent = card.title;
+  document.getElementById('mMeta').textContent = `#${card.id} · status: ${card.status} · approval: ${card.approval?.status || 'n/a'}`;
+  document.getElementById('mDesc').textContent = card.description || '';
+
+  const sel = document.getElementById('mMove');
+  sel.innerHTML = '';
+  for (const col of COLS) {
+    const opt = el('option', { value: col.id, text: col.name + ` (${col.id})` });
+    if (col.id === card.status) opt.selected = true;
+    sel.appendChild(opt);
+  }
+
+  document.getElementById('modalBack').style.display = 'flex';
+}
+
+function closeModal() {
+  MODAL_CARD_ID = null;
+  document.getElementById('modalBack').style.display = 'none';
 }
 
 function render(board) {
@@ -127,24 +255,62 @@ function render(board) {
   // Columns
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
+
   for (const col of COLS) {
     const cards = (board.cards || []).filter(c => c.status === col.id)
       .sort((a,b) => (a.rank ?? 9999) - (b.rank ?? 9999));
+
+    const cardsWrap = el('div', {
+      class: 'cards',
+      'data-col': col.id,
+      ondragover: (e) => { e.preventDefault(); cardsWrap.classList.add('dragover'); },
+      ondragleave: () => cardsWrap.classList.remove('dragover'),
+      ondrop: (e) => {
+        e.preventDefault();
+        cardsWrap.classList.remove('dragover');
+        const idStr = e.dataTransfer.getData('text/plain');
+        const cardId = Number(idStr);
+        if (Number.isFinite(cardId)) proposeMove(cardId, col.id);
+      }
+    }, cards.map(c => {
+      const meta = el('div', { class:'meta' }, [
+        el('span', { class:'tag', text: `#${c.id}` }),
+        approvalTag(c),
+        ...(c.tags || []).map(t => el('span', { class:'tag', text: t }))
+      ]);
+
+      const cardEl = el('div', {
+        class: 'card',
+        draggable: 'true',
+        'data-id': String(c.id),
+        onclick: (ev) => {
+          // avoid click triggering after a drag
+          if (cardEl.classList.contains('dragging')) return;
+          openModal(c.id);
+        },
+        ondragstart: (e) => {
+          cardEl.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', String(c.id));
+          e.dataTransfer.effectAllowed = 'move';
+        },
+        ondragend: () => {
+          // small delay so click doesn't fire immediately after dragend on some browsers
+          setTimeout(() => cardEl.classList.remove('dragging'), 0);
+        }
+      }, [
+        el('div', { class:'title', text: c.title }),
+        meta,
+        el('div', { class:'desc', text: c.description || '' }),
+      ]);
+
+      return cardEl;
+    }));
+
     const colEl = el('div', { class:'col' }, [
       el('h2', {}, [el('span', { text: col.name }), el('span', { text: cards.length })]),
-      el('div', { class:'cards' }, cards.map(c => {
-        const meta = el('div', { class:'meta' }, [
-          el('span', { class:'tag', text: `#${c.id}` }),
-          approvalTag(c),
-          ...(c.tags || []).map(t => el('span', { class:'tag', text: t }))
-        ]);
-        return el('div', { class:'card' }, [
-          el('div', { class:'title', text: c.title }),
-          meta,
-          el('div', { class:'desc', text: c.description || '' }),
-        ]);
-      }))
+      cardsWrap
     ]);
+
     grid.appendChild(colEl);
   }
 }
@@ -152,13 +318,46 @@ function render(board) {
 async function load() {
   const res = await fetch('./board.json', { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to load board.json');
-  const board = await res.json();
-  render(board);
+  BOARD = await res.json();
+  render(BOARD);
 }
 
-document.getElementById('refresh').addEventListener('click', load);
+// UI events
+
+document.getElementById('refresh').addEventListener('click', () => {
+  clearProposal();
+  load();
+});
+
+document.getElementById('copyCmd').addEventListener('click', async () => {
+  if (!PROPOSAL?.cmd) return;
+  try {
+    await navigator.clipboard.writeText(PROPOSAL.cmd);
+    document.getElementById('copyCmd').textContent = 'Copied';
+    setTimeout(() => document.getElementById('copyCmd').textContent = 'Copy', 900);
+  } catch {
+    // fallback
+    alert('Could not copy automatically. Command:\n\n' + PROPOSAL.cmd);
+  }
+});
+
+document.getElementById('clearCmd').addEventListener('click', clearProposal);
+
+document.getElementById('mClose').addEventListener('click', closeModal);
+
+document.getElementById('modalBack').addEventListener('click', (e) => {
+  if (e.target.id === 'modalBack') closeModal();
+});
+
+document.getElementById('mPropose').addEventListener('click', () => {
+  if (!MODAL_CARD_ID) return;
+  const to = document.getElementById('mMove').value;
+  proposeMove(MODAL_CARD_ID, to);
+  closeModal();
+});
+
 load().catch(err => {
-  document.getElementById('grid').innerHTML = `<div class="small">Error: ${err.message}</div>`;
+  document.getElementById('grid').innerHTML = `<div class="small">Error: ${escapeHtml(err.message)}</div>`;
 });
 </script>
 </body>
