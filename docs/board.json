@@ -1,6 +1,6 @@
 {
   "repoUrl": "https://github.com/jonathangrice84/jonny-agile-board",
-  "updatedAt": "2026-02-08T13:03:30Z",
+  "updatedAt": "2026-02-08T13:04:30Z",
   "cards": [
     {
       "id": 1,
@@ -37,6 +37,15 @@
       "rank": 2,
       "tags": ["security"],
       "approval": {"status": "n/a"}
+    },
+    {
+      "id": 5,
+      "title": "Validate 3 business ideas (48-hour discovery sprint)",
+      "description": "Outcome: pick ONE best bet to pursue next week.\n\nProposed plan (once approved):\n1) I draft 10 ideas + scoring rubric (market pain, willingness to pay, distribution edge, speed to MVP).\n2) We shortlist to 3 ideas and define a tiny test for each (landing page, offer, outreach script).\n3) I produce copy + assets for tests; you approve any outreach/posting; then we run the tests and pick a winner.",
+      "status": "ready",
+      "rank": 1,
+      "tags": ["business", "strategy"],
+      "approval": {"status": "needs"}
     }
   ]
 }
