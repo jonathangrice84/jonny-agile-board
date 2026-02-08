@@ -1,6 +1,6 @@
 {
   "repoUrl": "https://github.com/jonathangrice84/jonny-agile-board",
-  "updatedAt": "2026-02-08T12:57:00Z",
+  "updatedAt": "2026-02-08T13:03:30Z",
   "cards": [
     {
       "id": 1,
@@ -13,21 +13,30 @@
     },
     {
       "id": 2,
-      "title": "Set up GitHub Pages Agile Board", 
-      "description": "Publish a phone-friendly board with explicit review/approval gating.",
-      "status": "in_progress",
+      "title": "Set up GitHub Pages Agile Board",
+      "description": "Publish a phone-friendly board with explicit review/approval gating.\n\nShipped: GitHub Pages + clickable cards + drag/drop proposals.",
+      "status": "done",
       "rank": 1,
       "tags": ["ops"],
       "approval": {"status": "n/a"}
     },
     {
       "id": 3,
-      "title": "Define approval protocol", 
-      "description": "Rule: no external actions without Jonny approval in Telegram.\n\nProposed: Jonny says ‘Approved ✅ #ID’ and theclaw executes + commits updates.",
-      "status": "ready",
+      "title": "Approval protocol (Jonny policy)",
+      "description": "Policy: If Jonny explicitly asks for something → theclaw auto-executes (including shipping code).\nIf theclaw proposes/creates something Jonny didn’t ask for → requires Jonny approval first.\n\nApprovals happen in Telegram (e.g. ‘Approved ✅ #ID’).",
+      "status": "done",
       "rank": 1,
       "tags": ["ops"],
-      "approval": {"status": "needs"}
+      "approval": {"status": "approved"}
+    },
+    {
+      "id": 4,
+      "title": "Enable repo security automation",
+      "description": "Enable secret scanning + push protection + Dependabot security updates.",
+      "status": "done",
+      "rank": 2,
+      "tags": ["security"],
+      "approval": {"status": "n/a"}
     }
   ]
 }
