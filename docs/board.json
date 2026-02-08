@@ -1,0 +1,33 @@
+{
+  "repoUrl": "https://github.com/jonathangrice84/jonny-agile-board",
+  "updatedAt": "2026-02-08T12:57:00Z",
+  "cards": [
+    {
+      "id": 1,
+      "title": "Seed idea bank (10 ideas worth testing)",
+      "description": "Outcome: capture 10 business ideas worth validating.\n\nNext: theclaw will propose a structured list + scoring rubric, then move to Ready for Jonny review.",
+      "status": "inbox",
+      "rank": 10,
+      "tags": ["business"],
+      "approval": {"status": "n/a"}
+    },
+    {
+      "id": 2,
+      "title": "Set up GitHub Pages Agile Board", 
+      "description": "Publish a phone-friendly board with explicit review/approval gating.",
+      "status": "in_progress",
+      "rank": 1,
+      "tags": ["ops"],
+      "approval": {"status": "n/a"}
+    },
+    {
+      "id": 3,
+      "title": "Define approval protocol", 
+      "description": "Rule: no external actions without Jonny approval in Telegram.\n\nProposed: Jonny says ‘Approved ✅ #ID’ and theclaw executes + commits updates.",
+      "status": "ready",
+      "rank": 1,
+      "tags": ["ops"],
+      "approval": {"status": "needs"}
+    }
+  ]
+}

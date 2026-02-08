@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jonny × theclaw — Agile Board</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a33;
+      --panel2: #0f1730;
+      --text: #e8eeff;
+      --muted: #aab6e6;
+      --accent: #7aa2ff;
+      --danger: #ff6b6b;
+      --ok: #2de38b;
+      --warn: #ffcf5c;
+      --border: rgba(255,255,255,0.10);
+    }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: linear-gradient(180deg, var(--bg), #070b16); color: var(--text); }
+    header { padding: 20px 18px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.12); position: sticky; top: 0; backdrop-filter: blur(8px); }
+    h1 { margin: 0; font-size: 18px; }
+    .sub { margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .wrap { padding: 16px 14px 28px; max-width: 1200px; margin: 0 auto; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    button { cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); padding: 8px 10px; border-radius: 10px; font-weight: 600; }
+    button:hover { border-color: rgba(255,255,255,0.25); }
+    .pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.04); color: var(--muted); font-size: 12px; }
+    .pill b { color: var(--text); }
+    .grid { display: grid; grid-template-columns: repeat(5, minmax(220px, 1fr)); gap: 10px; }
+    @media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, minmax(220px, 1fr)); } }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .col { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .col h2 { margin: 0; padding: 10px 12px; font-size: 14px; background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .col h2 span { color: var(--muted); font-weight: 600; }
+    .cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+    .card { background: var(--panel2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
+    .title { font-weight: 800; font-size: 13px; margin-bottom: 6px; }
+    .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag { font-size: 11px; border: 1px solid var(--border); padding: 2px 8px; border-radius: 999px; color: var(--muted); }
+    .tag.approval { color: #0b1020; border-color: transparent; font-weight: 900; }
+    .tag.approval.needs { background: var(--warn); }
+    .tag.approval.approved { background: var(--ok); }
+    .desc { color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 8px; white-space: pre-wrap; }
+    .small { color: var(--muted); font-size: 12px; }
+    a { color: var(--accent); }
+    .review { border: 1px dashed rgba(255,255,255,0.25); background: rgba(122,162,255,0.10); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jonny × theclaw — Agile Board</h1>
+    <div class="sub">
+      Source of truth: <code>docs/board.json</code> · Approvals happen in Telegram (“Approved ✅”), then theclaw commits/merges.
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="row">
+      <span class="pill">Last updated: <b id="updated">…</b></span>
+      <span class="pill">Cards: <b id="count">…</b></span>
+      <span class="pill">Needs your review: <b id="needs">…</b></span>
+      <button id="refresh">Refresh</button>
+      <span class="small">Repo: <a id="repo" href="#" target="_blank" rel="noreferrer">…</a></span>
+    </div>
+
+    <div id="reviewRow" class="row" style="display:none;"></div>
+
+    <div class="grid" id="grid"></div>
+
+    <p class="small" style="margin-top:14px;">Want changes? Tell theclaw: add columns, add fields, or switch to GitHub Issues-backed board.</p>
+  </div>
+
+<script>
+const COLS = [
+  { id: 'inbox', name: 'Inbox' },
+  { id: 'backlog', name: 'Backlog (Shaped)' },
+  { id: 'ready', name: 'Ready (Needs Approval)' },
+  { id: 'in_progress', name: 'In Progress' },
+  { id: 'blocked', name: 'Blocked' },
+  { id: 'done', name: 'Done' },
+];
+
+function el(tag, attrs={}, children=[]) {
+  const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) {
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else n.setAttribute(k, v);
+  }
+  for (const c of children) n.appendChild(c);
+  return n;
+}
+
+function approvalTag(card) {
+  const a = card.approval || { status: 'n/a' };
+  if (a.status === 'needs') return el('span', { class: 'tag approval needs', text: 'NEEDS REVIEW' });
+  if (a.status === 'approved') return el('span', { class: 'tag approval approved', text: 'APPROVED' });
+  return el('span', { class: 'tag', text: 'no approval' });
+}
+
+function render(board) {
+  document.getElementById('updated').textContent = board.updatedAt || '—';
+  document.getElementById('count').textContent = (board.cards || []).length;
+  const needs = (board.cards || []).filter(c => (c.approval?.status === 'needs')).length;
+  document.getElementById('needs').textContent = needs;
+
+  const repoUrl = board.repoUrl || 'https://github.com/';
+  const repoA = document.getElementById('repo');
+  repoA.href = repoUrl; repoA.textContent = repoUrl;
+
+  // Review row
+  const rr = document.getElementById('reviewRow');
+  rr.innerHTML = '';
+  const needsCards = (board.cards || []).filter(c => c.approval?.status === 'needs');
+  if (needsCards.length) {
+    rr.style.display = 'flex';
+    rr.appendChild(el('span', { class:'pill' }, [el('span', { text:'Actions waiting on Jonny:'})]));
+    for (const c of needsCards.slice(0, 6)) {
+      rr.appendChild(el('span', { class:'pill review' }, [el('b', { text: `#${c.id}` }), el('span', { text: c.title })]));
+    }
+    if (needsCards.length > 6) rr.appendChild(el('span', { class:'pill', text: `+${needsCards.length-6} more` }));
+  } else {
+    rr.style.display = 'none';
+  }
+
+  // Columns
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for (const col of COLS) {
+    const cards = (board.cards || []).filter(c => c.status === col.id)
+      .sort((a,b) => (a.rank ?? 9999) - (b.rank ?? 9999));
+    const colEl = el('div', { class:'col' }, [
+      el('h2', {}, [el('span', { text: col.name }), el('span', { text: cards.length })]),
+      el('div', { class:'cards' }, cards.map(c => {
+        const meta = el('div', { class:'meta' }, [
+          el('span', { class:'tag', text: `#${c.id}` }),
+          approvalTag(c),
+          ...(c.tags || []).map(t => el('span', { class:'tag', text: t }))
+        ]);
+        return el('div', { class:'card' }, [
+          el('div', { class:'title', text: c.title }),
+          meta,
+          el('div', { class:'desc', text: c.description || '' }),
+        ]);
+      }))
+    ]);
+    grid.appendChild(colEl);
+  }
+}
+
+async function load() {
+  const res = await fetch('./board.json', { cache: 'no-store' });
+  if (!res.ok) throw new Error('Failed to load board.json');
+  const board = await res.json();
+  render(board);
+}
+
+document.getElementById('refresh').addEventListener('click', load);
+load().catch(err => {
+  document.getElementById('grid').innerHTML = `<div class="small">Error: ${err.message}</div>`;
+});
+</script>
+</body>
+</html>
